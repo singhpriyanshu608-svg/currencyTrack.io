@@ -19,6 +19,17 @@ const histPanel = document.querySelector(".history-panel");
 const logPanel = document.querySelector(".log-panel");
 const comPanel = document.querySelector(".compare-panel");
 const panels = document.querySelectorAll('.panel')
+const favBtn = document.querySelector(".favourites-btn");
+const favlist = document.querySelector(".favorites-list");
+
+console.log(favBtn);
+
+const favCurr = [];
+
+
+favBtn.addEventListener('click' , ()=>{
+  savingFav();
+})
 
 console.log(panels);
 
@@ -310,6 +321,22 @@ function drawChart(labels, values) {
     },
   });
 }
+
+
+const savingFav = function () {
+  // console.log(sendCurrency);
+  // console.log(receiveCurrency);
+  favCurr.push({
+    from : sendCurrency.code,
+    to : receiveCurrency.code
+
+  })
+  console.log(favCurr);
+  localStorage.setItem("favorites", JSON.stringify(favCurr));
+  console.log(localStorage.getItem("favorites"));
+  
+
+};
 
 async function init() {
   const response = await fetch("./data/countries.json");
