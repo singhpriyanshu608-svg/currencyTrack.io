@@ -766,6 +766,14 @@ label{
     font-size:15px;
 }
 
+.favorites-list {
+    border: 2px solid red;
+}
+
+.favorites-list li {
+    color: white;
+    padding: 10px;
+}
 
 
 .hidden{

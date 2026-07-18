@@ -21,10 +21,12 @@ const comPanel = document.querySelector(".compare-panel");
 const panels = document.querySelectorAll('.panel')
 const favBtn = document.querySelector(".favourites-btn");
 const favlist = document.querySelector(".favorites-list");
-
+const emptyState = document.getElementById("favoritesEmpty");
+const favBadge = document.querySelector("#favoritesBadge");
+let counter = 0;
 console.log(favBtn);
 
-const favCurr = [];
+const favCurr = new Map() ;
 
 
 favBtn.addEventListener('click' , ()=>{
@@ -324,18 +326,22 @@ function drawChart(labels, values) {
 
 
 const savingFav = function () {
-  // console.log(sendCurrency);
-  // console.log(receiveCurrency);
-  favCurr.push({
-    from : sendCurrency.code,
-    to : receiveCurrency.code
-
-  })
+ console.log(favlist)
+  const key = `${sendCurrency.code}-${receiveCurrency.code}`;
+  favCurr.set(key, {
+    from: sendCurrency.code,
+    to: receiveCurrency.code,
+  });
   console.log(favCurr);
-  localStorage.setItem("favorites", JSON.stringify(favCurr));
+  const favArr = [...favCurr.values()]
+  if (favArr.length > 0) {
+    emptyState.style.display = "none";
+  } else {
+    emptyState.style.display = "block";
+  }
+  localStorage.setItem("favorites", JSON.stringify([...favCurr.values()]));
   console.log(localStorage.getItem("favorites"));
-  
-
+  renderFav(favArr);
 };
 
 async function init() {
@@ -353,3 +359,21 @@ async function init() {
   await loadChart();
 }
 init();
+
+ const renderFav = function (favArr) {
+  favlist.innerHTML = '';
+  favArr.forEach((fav) => {
+    const li = document.createElement('li');
+    li.innerHTML = `
+  <span>${fav.from} → ${fav.to}</span>
+  <button class="delete-btn">Delete</button>
+`;
+
+ favlist.appendChild(li);
+ counter++;
+ console.log(counter);
+ favBadge.innerHTML = `${counter}`
+  })
+ }
+
+  console.log(favlist);
