@@ -13,25 +13,42 @@ const fromFoot = document.querySelector(".fromFoot");
 const rateValue = document.querySelector(".rateValue");
 const toFoot = document.querySelector(".toFoot");
 const dateBtns = document.querySelectorAll(".range-btn");
-const tab = document.querySelectorAll('.tab');
+const tab = document.querySelectorAll(".tab");
 const favPanel = document.querySelector(".favorites-panel");
 const histPanel = document.querySelector(".history-panel");
 const logPanel = document.querySelector(".log-panel");
 const comPanel = document.querySelector(".compare-panel");
-const panels = document.querySelectorAll('.panel')
+const panels = document.querySelectorAll(".panel");
 const favBtn = document.querySelector(".favourites-btn");
 const favlist = document.querySelector(".favorites-list");
 const emptyState = document.getElementById("favoritesEmpty");
 const favBadge = document.querySelector("#favoritesBadge");
+
+const tickerPairs = [
+  { from: "EUR", to: "USD" },
+  { from: "USD", to: "JPY" },
+  { from: "GBP", to: "USD" },
+  { from: "USD", to: "INR" },
+  { from: "AUD", to: "USD" },
+  { from: "USD", to: "CAD" },
+  { from: "USD", to: "CHF" },
+  { from: "NZD", to: "USD" },
+  { from: "EUR", to: "GBP" },
+  { from: "USD", to: "CNY" },
+  { from: "EUR", to: "JPY" },
+  { from: "GBP", to: "JPY" },
+  { from: "USD", to: "SGD" },
+  { from: "USD", to: "ZAR" },
+];
+
 let counter = 0;
 console.log(favBtn);
 
-const favCurr = new Map() ;
+const favCurr = new Map();
 
-
-favBtn.addEventListener('click' , ()=>{
+favBtn.addEventListener("click", () => {
   savingFav();
-})
+});
 
 console.log(panels);
 
@@ -41,23 +58,23 @@ let currencies = [];
 const today = new Date();
 
 dateBtns.forEach((btn) => {
-   btn.addEventListener("click", () => {
+  btn.addEventListener("click", () => {
     dateBtns.forEach((b) => b.classList.remove("range-btn--active"));
-    btn.classList.add('range-btn--active')
+    btn.classList.add("range-btn--active");
     const range = Number(btn.dataset.range); // '1', '7', '30', etc.
     selectedRange = range;
-    loadChart()
+    loadChart();
   });
 });
 
 tab.forEach((tabBtn) => {
-  tabBtn.addEventListener('click' , ()=> {
+  tabBtn.addEventListener("click", () => {
     tab.forEach((x) => x.classList.remove("tab--active"));
     if (tabBtn.dataset.panel === "history") {
     }
     if (tabBtn.dataset.panel === "favorites") {
-    panels.forEach((panel)=> panel.classList.remove('active'))
-     favPanel.classList.add('active')
+      panels.forEach((panel) => panel.classList.remove("active"));
+      favPanel.classList.add("active");
     }
     if (tabBtn.dataset.panel === "history") {
       panels.forEach((panel) => panel.classList.remove("active"));
@@ -73,10 +90,8 @@ tab.forEach((tabBtn) => {
     }
 
     tabBtn.classList.add("tab--active");
-  })
-})
-
-
+  });
+});
 
 // async function loadCon() {
 // const response = await fetch("./data/countries.json");
@@ -150,13 +165,13 @@ function renderCurrencyList(list = currencies) {
       if (currentSelection == "send") {
         sendCurrency = currency;
         updateCurrency(sendCurrencyButton, currency);
-        convertCurrency()
-        loadChart()
+        convertCurrency();
+        loadChart();
       } else {
         receiveCurrency = currency;
         updateCurrency(receiveCurrencyButton, currency);
-        convertCurrency()
-        loadChart()
+        convertCurrency();
+        loadChart();
       }
       closeCurrencyDropdown();
     });
@@ -172,8 +187,8 @@ function swapCurrency() {
     receiveAmountInput.value,
     sendAmountInput.value,
   ];
-   convertCurrency();
-   loadChart();
+  convertCurrency();
+  loadChart();
 }
 
 async function convertCurrency() {
@@ -235,31 +250,30 @@ function searchCurrency(e) {
 // });
 
 const loadChart = async function () {
-  try{
-   const from = sendCurrency.code;
-  const to = receiveCurrency.code
-  const startDate = today.toISOString().split("T")[0];
-  console.log(startDate)
-  const endDateObj = new Date(today);
-  endDateObj.setDate(endDateObj.getDate() - Number(selectedRange));
-  const endDate = endDateObj.toISOString().split("T")[0];
-  console.log(selectedRange)
-  console.log(endDate)
-  const response = await fetch(
-    `https://api.frankfurter.dev/v1/${endDate}..${startDate}?from=${from}&to=${to}`,
-  );
-  console.log(response);
-  const data = await response.json();
-  console.log(data);
-  const labels = Object.keys(data.rates);
-  const values = Object.values(data.rates).map((rates) => rates[to]);
-  console.log(labels);
-  console.log(values);
-  drawChart(labels, values);
-  }catch(err) {
+  try {
+    const from = sendCurrency.code;
+    const to = receiveCurrency.code;
+    const startDate = today.toISOString().split("T")[0];
+    console.log(startDate);
+    const endDateObj = new Date(today);
+    endDateObj.setDate(endDateObj.getDate() - Number(selectedRange));
+    const endDate = endDateObj.toISOString().split("T")[0];
+    console.log(selectedRange);
+    console.log(endDate);
+    const response = await fetch(
+      `https://api.frankfurter.dev/v1/${endDate}..${startDate}?from=${from}&to=${to}`,
+    );
+    console.log(response);
+    const data = await response.json();
+    console.log(data);
+    const labels = Object.keys(data.rates);
+    const values = Object.values(data.rates).map((rates) => rates[to]);
+    console.log(labels);
+    console.log(values);
+    drawChart(labels, values);
+  } catch (err) {
     console.log(`the error is ${err}`);
   }
-  
 };
 
 function drawChart(labels, values) {
@@ -324,16 +338,15 @@ function drawChart(labels, values) {
   });
 }
 
-
 const savingFav = function () {
- console.log(favlist)
+  console.log(favlist);
   const key = `${sendCurrency.code}-${receiveCurrency.code}`;
   favCurr.set(key, {
     from: sendCurrency.code,
     to: receiveCurrency.code,
   });
   console.log(favCurr);
-  const favArr = [...favCurr.values()]
+  const favArr = [...favCurr.values()];
   if (favArr.length > 0) {
     emptyState.style.display = "none";
   } else {
@@ -360,20 +373,67 @@ async function init() {
 }
 init();
 
- const renderFav = function (favArr) {
-  favlist.innerHTML = '';
+const renderFav = function (favArr) {
+  favlist.innerHTML = "";
   favArr.forEach((fav) => {
-    const li = document.createElement('li');
+    const li = document.createElement("li");
     li.innerHTML = `
   <span>${fav.from} → ${fav.to}</span>
   <button class="delete-btn">Delete</button>
 `;
 
- favlist.appendChild(li);
- counter++;
- console.log(counter);
- favBadge.innerHTML = `${counter}`
-  })
- }
+    favlist.appendChild(li);
+    counter++;
+    console.log(counter);
+    favBadge.innerHTML = `${counter}`;
+  });
+};
 
-  console.log(favlist);
+console.log(favlist);
+
+// live market dynamic autoscroll
+
+function getYesterdayDate() {
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  return yesterday.toISOString().split("T")[0];
+}
+
+async function loadTicker() {
+  const tickerList = document.querySelector(".ticker-list ul"); 
+  tickerList.innerHTML = "";
+
+  const yesterday = getYesterdayDate();
+
+  for (const pair of tickerPairs) {
+    try {
+      const response = await fetch(`https://api.frankfurter.dev/v1/latest?from=${pair.from}&to=${pair.to}`);
+      const data = await response.json();
+      const rate = data.rates[pair.to];
+
+      const oldResponse = await fetch(`https://api.frankfurter.dev/v1/${yesterday}?from=${pair.from}&to=${pair.to}`);
+      const oldData = await oldResponse.json();
+      const oldRate = oldData.rates[pair.to];
+
+      const change = ((rate - oldRate) / oldRate) * 100;
+      const isUp = change >= 0;
+
+      const li = document.createElement("li");
+      li.className = "ticker-item";
+      li.innerHTML = `
+        <span class="ticker-item-pair">${pair.from}/${pair.to}</span>
+        <span class="ticker-item-rate">${rate.toFixed(2)}</span>
+        <span class="ticker-item-change ${isUp ? "ticker-item-change-up" : "ticker-item-change-down"}">
+          ${isUp ? "▲" : "▼"} ${isUp ? "+" : ""}${change.toFixed(2)}%
+        </span>
+      `;
+      tickerList.appendChild(li);
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  
+  tickerList.innerHTML += tickerList.innerHTML;
+}
+loadTicker();
