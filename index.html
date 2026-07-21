@@ -205,21 +205,80 @@
 
 <!-- ================= COMPARE ================= -->
 
-<section class="compare-panel panel">
+<div class="panel compare-panel">
+  <h3 class="compare-title">Compare Rates</h3>
 
-  <div class="compare-header">
-    <div>
-      <span class="compare-title">Multi-currency</span>
-      <span class="compare-subtitle">1000 USD</span>
-    </div>
+  <div class="compare-controls">
+    <input
+      type="number"
+      class="compare-amount"
+      value="100"
+      placeholder="Amount"
+    />
 
-    <span class="compare-count">
-      <span id="compareCount">0</span> pairs
-    </span>
+    <button class="compare-base">
+      <span>🇺🇸</span>
+      <span>USD</span>
+    </button>
   </div>
 
-  <ul class="compare-list" id="compareList"></ul>
+  <ul class="compare-list">
+    <li class="compare-item">
+      <div class="compare-left">
+        <span class="flag">🇮🇳</span>
+        <span>INR</span>
+      </div>
 
+      <div class="compare-right">
+        ₹8,635.20
+      </div>
+    </li>
+
+    <li class="compare-item">
+      <div class="compare-left">
+        <span class="flag">🇪🇺</span>
+        <span>EUR</span>
+      </div>
+
+      <div class="compare-right">
+        €85.12
+      </div>
+    </li>
+
+    <li class="compare-item">
+      <div class="compare-left">
+        <span class="flag">🇬🇧</span>
+        <span>GBP</span>
+      </div>
+
+      <div class="compare-right">
+        £73.44
+      </div>
+    </li>
+
+    <li class="compare-item">
+      <div class="compare-left">
+        <span class="flag">🇯🇵</span>
+        <span>JPY</span>
+      </div>
+
+      <div class="compare-right">
+        ¥16,021
+      </div>
+    </li>
+
+    <li class="compare-item">
+      <div class="compare-left">
+        <span class="flag">🇨🇦</span>
+        <span>CAD</span>
+      </div>
+
+      <div class="compare-right">
+        C$137.42
+      </div>
+    </li>
+  </ul>
+</div>
 </section>
 
 <!-- ================= FAVORITES ================= -->
