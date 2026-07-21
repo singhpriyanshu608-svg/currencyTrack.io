@@ -3,7 +3,9 @@ import { loadChart } from "./utiles/chart.js";
 // QUERY SELECTORS
 const converter = document.querySelector(".converter");
 const sendCurrencyButton = document.querySelector(".send-box .currency-select");
-const receiveCurrencyButton = document.querySelector(".receive-box .currency-select");
+const receiveCurrencyButton = document.querySelector(
+  ".receive-box .currency-select",
+);
 const currencyList = document.querySelector(".currency-list");
 const sendAmountInput = document.querySelector("#send-amount");
 const receiveAmountInput = document.querySelector("#receive-amount");
@@ -24,8 +26,12 @@ const favBtn = document.querySelector(".favourites-btn");
 const favlist = document.querySelector(".favorites-list");
 const emptyState = document.getElementById("favoritesEmpty");
 const favBadge = document.querySelector("#favoritesBadge");
+const statOpen = document.getElementById("statOpen");
+const statLast = document.getElementById("statLast");
+const statChange = document.getElementById("statChange");
+const statPercent = document.getElementById("statPercent");
 
-let favArr = []
+let favArr = [];
 
 const tickerPairs = [
   { from: "EUR", to: "USD" },
@@ -80,12 +86,18 @@ searchInput.addEventListener("input", searchCurrency);
 // LOOPS
 
 dateBtns.forEach((btn) => {
-  btn.addEventListener("click", () => {
+  btn.addEventListener("click", async () => {
     dateBtns.forEach((b) => b.classList.remove("range-btn--active"));
     btn.classList.add("range-btn--active");
     const range = Number(btn.dataset.range);
     selectedRange = range;
-    loadChart(today, sendCurrency, receiveCurrency, selectedRange);
+    const values = await loadChart(
+      today,
+      sendCurrency,
+      receiveCurrency,
+      selectedRange,
+    );
+    updateStats(values);
   });
 });
 
@@ -153,7 +165,7 @@ function renderCurrencyList(list = currencies) {
     `;
     currencyList.appendChild(listItem);
 
-    listItem.addEventListener("click", () => {
+    listItem.addEventListener("click", async () => {
       if (currentSelection == "send") {
         sendCurrency = currency;
         updateCurrency(sendCurrencyButton, currency);
@@ -162,13 +174,19 @@ function renderCurrencyList(list = currencies) {
         updateCurrency(receiveCurrencyButton, currency);
       }
       convertCurrency();
-      loadChart(today, sendCurrency, receiveCurrency, selectedRange);
+      const values = await loadChart(
+        today,
+        sendCurrency,
+        receiveCurrency,
+        selectedRange,
+      );
+      updateStats(values);
       closeCurrencyDropdown();
     });
   });
 }
 
-function swapCurrency() {
+async function swapCurrency() {
   [sendCurrency, receiveCurrency] = [receiveCurrency, sendCurrency];
   updateCurrency(sendCurrencyButton, sendCurrency);
   updateCurrency(receiveCurrencyButton, receiveCurrency);
@@ -178,7 +196,13 @@ function swapCurrency() {
     sendAmountInput.value,
   ];
   convertCurrency();
-  loadChart(today, sendCurrency, receiveCurrency, selectedRange);
+  const values = await loadChart(
+    today,
+    sendCurrency,
+    receiveCurrency,
+    selectedRange,
+  );
+  updateStats(values);
 }
 
 async function convertCurrency() {
@@ -220,7 +244,7 @@ const savingFav = function () {
     from: sendCurrency.code,
     to: receiveCurrency.code,
   });
-   favArr = [...favCurr.values()];
+  favArr = [...favCurr.values()];
   if (favArr.length > 0) {
     emptyState.style.display = "none";
   } else {
@@ -239,14 +263,12 @@ const renderFav = function (favArr) {
       <span>${fav.from} → ${fav.to}</span>
       <button class="delete-btn">Delete</button>
     `;
-    li.setAttribute('data-index' , `${index}` )
+    li.setAttribute("data-index", `${index}`);
     favlist.appendChild(li);
-     index = index + 1;
+    index = index + 1;
   });
   favBadge.innerHTML = favArr.length;
 };
-
-
 
 const deleteBtn = document.querySelector(".delete-btn");
 favlist.addEventListener("click", (e) => {
@@ -274,18 +296,24 @@ async function init() {
   updateCurrency(receiveCurrencyButton, receiveCurrency);
 
   convertCurrency();
-  await loadChart(today, sendCurrency, receiveCurrency, selectedRange);
+  const values = await loadChart(
+    today,
+    sendCurrency,
+    receiveCurrency,
+    selectedRange,
+  );
+  updateStats(values);
 
-      const saved = JSON.parse(localStorage.getItem("favorites")) || [];
+  const saved = JSON.parse(localStorage.getItem("favorites")) || [];
 
-      saved.forEach((item) => {
-        favCurr.set(`${item.from}-${item.to}`, item);
-      });
+  saved.forEach((item) => {
+    favCurr.set(`${item.from}-${item.to}`, item);
+  });
 
-      favArr = [...favCurr.values()];
-      renderFav(favArr);
+  favArr = [...favCurr.values()];
+  renderFav(favArr);
 
-        await loadTicker();
+  await loadTicker();
 }
 init();
 
@@ -336,4 +364,20 @@ async function loadTicker() {
   }
 
   tickerList.innerHTML += tickerList.innerHTML;
+}
+
+function updateStats(values) {
+  const open = values[0];
+  const last = values[values.length - 1];
+  const change = last - open;
+  const percentChange = (change / open) * 100;
+  const isUp = change >= 0;
+
+  statOpen.textContent = open.toFixed(4);
+  statLast.textContent = last.toFixed(4);
+  statChange.textContent = `${isUp ? "+" : ""}${change.toFixed(4)}`;
+  statPercent.textContent = `${isUp ? "▲ +" : "▼ "}${percentChange.toFixed(2)}%`;
+
+  statChange.className = `stat-value ${isUp ? "stat-value--positive" : "stat-value--negative"}`;
+  statPercent.className = `stat-value ${isUp ? "stat-value--positive" : "stat-value--negative"}`;
 }
