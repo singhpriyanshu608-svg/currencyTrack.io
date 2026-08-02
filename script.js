@@ -1,5 +1,5 @@
 import { loadChart } from "./utiles/chart.js";
-
+import "./compare.js";
 // QUERY SELECTORS
 const converter = document.querySelector(".converter");
 const sendCurrencyButton = document.querySelector(".send-box .currency-select");
@@ -30,6 +30,12 @@ const statOpen = document.getElementById("statOpen");
 const statLast = document.getElementById("statLast");
 const statChange = document.getElementById("statChange");
 const statPercent = document.getElementById("statPercent");
+const compareAmountInput = document.querySelector(".compare-amount");
+const compareBaseButton = document.querySelector(".compare-base");
+const compare_code = document.querySelector(".code-compare");
+const compare_flag = document.querySelector(".flag-compare");
+
+
 
 let favArr = [];
 
@@ -59,7 +65,24 @@ let currencies = [];
 const today = new Date();
 let sendCurrency = currencies[0];
 let receiveCurrency = currencies[1];
+let compare_currency_base = currencies[0];
 let currentSelection = null;
+
+let com_curr_inr = currencies[13];
+let com_curr_eur = currencies[7];
+let com_curr_gbp = currencies[8];
+let com_curr_jpy = currencies[15];
+let com_curr_cad = currencies[2];
+
+
+const currlistcompare = [
+  com_curr_inr,
+  com_curr_eur,
+  com_curr_gbp,
+  com_curr_jpy,
+  com_curr_cad, 
+];
+
 
 // EVENT LISTENERS
 
@@ -82,6 +105,12 @@ sendAmountInput.addEventListener("input", () => {
   convertCurrency();
 });
 searchInput.addEventListener("input", searchCurrency);
+
+
+compareBaseButton.addEventListener("click", (e) => {
+  currentSelection = "compare"
+  openCurrencyDropdown(e);
+});
 
 // LOOPS
 
@@ -169,9 +198,13 @@ function renderCurrencyList(list = currencies) {
       if (currentSelection == "send") {
         sendCurrency = currency;
         updateCurrency(sendCurrencyButton, currency);
-      } else {
+      } else if (currentSelection == 'receive'){
         receiveCurrency = currency;
         updateCurrency(receiveCurrencyButton, currency);
+      }
+      else {
+        compare_currency_base = currency;
+        updateCurrency(compareBaseButton , currency)
       }
       convertCurrency();
       const values = await loadChart(
@@ -209,6 +242,27 @@ async function convertCurrency() {
   const from = sendCurrency.code;
   const to = receiveCurrency.code;
   const amount = Number(sendAmountInput.value);
+  try {
+    const response = await fetch(
+      `https://api.frankfurter.dev/v1/latest?from=${from}&to=${to}`,
+    );
+    const data = await response.json();
+    const rate = data.rates[to];
+    receiveAmountInput.value = (amount * rate).toFixed(2);
+    receiveAmountInput.disabled = true;
+    fromFoot.textContent = sendCurrency.code;
+    toFoot.textContent = receiveCurrency.code;
+    rateValue.textContent = rate.toFixed(2);
+  } catch (err) {
+    console.log(err);
+    receiveAmountInput.value = "NAN";
+  }
+}
+
+async function compareCurrency(curr) {
+  const from = compare_currency_base.code;
+  const to = curr.code;
+  const amount = Number(compareAmountInput.value);
   try {
     const response = await fetch(
       `https://api.frankfurter.dev/v1/latest?from=${from}&to=${to}`,

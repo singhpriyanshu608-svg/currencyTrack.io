@@ -1,0 +1,6 @@
+
+
+const loadCompare = async function(){
+
+    
+}
