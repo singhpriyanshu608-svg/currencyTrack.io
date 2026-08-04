@@ -1,5 +1,5 @@
 import { loadChart } from "./utiles/chart.js";
-import "./compare.js";
+import { renderCompare } from "./compare.js";
 // QUERY SELECTORS
 const converter = document.querySelector(".converter");
 const sendCurrencyButton = document.querySelector(".send-box .currency-select");
@@ -204,7 +204,8 @@ function renderCurrencyList(list = currencies) {
       }
       else {
         compare_currency_base = currency;
-        updateCurrency(compareBaseButton , currency)
+        updateCurrency(compareBaseButton , currency);
+        renderCompare(compare_currency_base);
       }
       convertCurrency();
       const values = await loadChart(
@@ -346,6 +347,8 @@ async function init() {
   sendCurrency = currencies.find((c) => c.code === "USD");
   receiveCurrency = currencies.find((c) => c.code === "INR");
 
+  compare_currency_base = currencies.find((c) => c.code === "USD");
+
   updateCurrency(sendCurrencyButton, sendCurrency);
   updateCurrency(receiveCurrencyButton, receiveCurrency);
 
@@ -366,6 +369,7 @@ async function init() {
 
   favArr = [...favCurr.values()];
   renderFav(favArr);
+  renderCompare(compare_currency_base);
 
   await loadTicker();
 }
